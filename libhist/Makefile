@@ -1,5 +1,8 @@
 FC       = ifx
+SHELL    = /bin/bash
 FCFLAGS  = -O2 -fPIC
+MODULE_INIT = source /usr/share/Modules/init/bash >/dev/null 2>&1 || source /etc/profile.d/modules.sh >/dev/null 2>&1
+MODULE_LOAD = module load intel-oneapi/2024.2 hdf5/oneapi-2024.2/1.14.4 netcdf/oneapi-2024.2/hdf5-1.14.4/4.9.2
 
 LIB      = libhist.a
 OBJS     = hist.o
@@ -17,6 +20,8 @@ $(LIB): $(OBJS)
 	ar rcs $@ $^
 
 hist.o: hist.f90
+	$(MODULE_INIT) && \
+	$(MODULE_LOAD) && \
 	$(FC) $(FCFLAGS) -c $< -o $@
 
 install: $(LIB)

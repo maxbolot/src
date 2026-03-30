@@ -1,6 +1,8 @@
 FC       = ifx
+SHELL    = /bin/bash
 FCFLAGS  = -O2 -fPIC
-NCFLAGS  = $(shell nf-config --fflags)
+MODULE_INIT = source /usr/share/Modules/init/bash >/dev/null 2>&1 || source /etc/profile.d/modules.sh >/dev/null 2>&1
+MODULE_LOAD = module load intel-oneapi/2024.2 hdf5/oneapi-2024.2/1.14.4 netcdf/oneapi-2024.2/hdf5-1.14.4/4.9.2
 
 LIB      = libnc.a
 OBJS     = nc.o
@@ -18,7 +20,9 @@ $(LIB): $(OBJS)
 	ar rcs $@ $^
 
 nc.o: nc.f90
-	$(FC) $(FCFLAGS) $(NCFLAGS) -c $< -o $@
+	$(MODULE_INIT) && \
+	$(MODULE_LOAD) && \
+	$(FC) $(FCFLAGS) $$(nf-config --fflags) -c $< -o $@
 
 install: $(LIB)
 	install -d $(LIBDIR) $(INCDIR)
